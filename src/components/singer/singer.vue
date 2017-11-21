@@ -1,13 +1,118 @@
 <template>
-  <div>
-    歌手
+  <div class="singer" ref="singer">
+    <list-view @select="selectSinger" :data="singers" ref="list"></list-view>
+    <router-view></router-view>
   </div>
 </template>
 
-<script type="text/ecmascript-6">
+<script>
+  import {getSingerList} from '../../api/singer.js'
+  import {ERR_OK} from '../../api/config.js'
+  import Singer from '../../common/js/singer.js'
+  import ListView from '../../base/listview/listview.vue'
+
+  const HOT_SINGER_LEN = 10
+  const HOT_NAME = '热门'
+
+  export default {
+    data() {
+      return {
+        singers: []
+      }
+    },
+
+    created() {
+      this._getSingerList()
+    },
+
+    methods: {
+      handlePlaylist(playlist) {
+        const bottom = playlist.length > 0 ? '60px' : ''
+        this.$refs.singer.style.bottom = bottom
+        this.$refs.list.refresh()
+      },
+      selectSinger(singer) {
+        this.$router.push({
+          path: `/singer/${singer.id}`
+        })
+        this.setSinger(singer)
+      },
+      _getSingerList() {
+        getSingerList().then((res) => {
+          if (res.code === ERR_OK) {
+            this.singers = this._normalizeSinger(res.data.list)
+//            console.log(res)
+          }
+        })
+      },
+      /*核心，因为getSingerList中返回的数据res是所有歌声的信息，而我们想要的是按字母排列的*/
+      _normalizeSinger(list) {
+        let map = {    //map对象包括hot、key属性
+          hot: {
+            title: HOT_NAME,  //title就是侧栏显示的东西，这里为热门
+            items: []
+          }
+        }
+        //console.log(list)
+
+        /*获得map  热门+A-Z*/
+        list.forEach((item, index) => {
+          /*小于10则是热门*/
+          if (index < HOT_SINGER_LEN) {
+            map.hot.items.push(new Singer({
+              name: item.Fsinger_name,
+              id: item.Fsinger_mid
+            }))
+          }
+          /*这里的Findex是姓氏字母,为A-Z*/
+          const key = item.Findex
+          //这里的if是必须要加的，因为一开始的map只有hot对象，因为没有key，所以放在后面来添加
+          if (!map[key]) {  //这里的map[key]就是A-Z包含的歌手集合，这里和热门的不冲突，因为热门的也有Findex
+            map[key] = {
+              title: key, //title就是侧栏显示的东西，这里为A-Z
+              items: []
+            }
+          }
+          map[key].items.push(new Singer({
+            name: item.Fsinger_name,
+            id: item.Fsinger_mid
+          }))
+        })
+
+        console.log(map)
+
+        // 为了得到有序列表，我们需要处理 map，因为现在的map是map.key+map.hot的混合体
+        //处理后的好处，1、有序 2、hot和ret分开
+        let ret = [] //A-Z
+        let hot = [] //热门
+        for (let key in map) {
+          let val = map[key] //A-Z的集合
+          if (val.title.match(/[a-zA-Z]/)) {
+            ret.push(val)
+          } else if (val.title === HOT_NAME) {
+            hot.push(val)
+          }
+        }
+        ret.sort((a, b) => {
+          return a.title.charCodeAt(0) - b.title.charCodeAt(0)
+        })
+        console.log(this.singers)
+
+        return hot.concat(ret)
+      },
+    },
+    components: {
+      ListView
+    }
+  }
 
 </script>
 
 <style scoped lang="stylus" rel="stylesheet/stylus">
-
+  /*固定父容器的高度，以便进行滚动*/
+  .singer
+    position: fixed
+    top: 88px
+    bottom: 0
+    width: 100%
 </style>
