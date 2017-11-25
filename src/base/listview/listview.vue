@@ -13,6 +13,7 @@
         <!--这个h2是不同字母歌手之间的分割线-->
         <h2 class="list-group-title">{{group.title}}</h2>
         <uL>
+          <!--歌手详情页点击事件-->
           <li @click="selectItem(item)" v-for="item in group.items" class="list-group-item">
             <img class="avatar" v-lazy="item.avatar">
             <span class="name">{{item.name}}</span>
@@ -87,7 +88,7 @@
     },
     methods: {
       selectItem(item) {
-        this.$emit('select', item)
+        this.$emit('select', item) //点击事件纯粹是把事件派发出去，因为listView是个基础组件，不负责业务逻辑
       },
 
       /*移动端点击事件，相当于click*/

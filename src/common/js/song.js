@@ -1,5 +1,5 @@
-import {getLyric} from 'api/song'
-import {ERR_OK} from 'api/config'
+// import {getLyric} from '../../api/song'
+import {ERR_OK} from '../../api/config'
 import {Base64} from 'js-base64'
 
 export default class Song {
@@ -14,29 +14,30 @@ export default class Song {
     this.url = url
   }
 
-  getLyric() {
-    if (this.lyric) {
-      return Promise.resolve(this.lyric)
-    }
-
-    return new Promise((resolve, reject) => {
-      getLyric(this.mid).then((res) => {
-        if (res.retcode === ERR_OK) {
-          this.lyric = Base64.decode(res.lyric)
-          resolve(this.lyric)
-        } else {
-          reject('no lyric')
-        }
-      })
-    })
-  }
+  // getLyric() {
+  //   if (this.lyric) {
+  //     return Promise.resolve(this.lyric)
+  //   }
+  //
+  //   return new Promise((resolve, reject) => {
+  //     getLyric(this.mid).then((res) => {
+  //       if (res.retcode === ERR_OK) {
+  //         this.lyric = Base64.decode(res.lyric)
+  //         resolve(this.lyric)
+  //       } else {
+  //         reject('no lyric')
+  //       }
+  //     })
+  //   })
+  // }
 }
 
+/*抽象工厂模式*/
 export function createSong(musicData) {
   return new Song({
     id: musicData.songid,
     mid: musicData.songmid,
-    singer: filterSinger(musicData.singer),
+    singer: filterSinger(musicData.singer),  //singer是个数组，包含id、mid、name，需要过滤一下
     name: musicData.songname,
     album: musicData.albumname,
     duration: musicData.interval,
@@ -50,8 +51,8 @@ function filterSinger(singer) {
   if (!singer) {
     return ''
   }
-  singer.forEach((s) => {
-    ret.push(s.name)
+  singer.forEach((item) => { //多个歌手的情况用/分开
+    ret.push(item.name)
   })
   return ret.join('/')
 }

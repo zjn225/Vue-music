@@ -21,6 +21,7 @@ export function getData(el, name, val) {
   return el.getAttribute(prefix + name)
 }
 
+/*利用浏览器能力检测特性自动增加前缀*/
 let elementStyle = document.createElement('div').style
 
 let vendor = (() => {
@@ -51,4 +52,5 @@ export function prefixStyle(style) {
   }
 
   return vendor + style.charAt(0).toUpperCase() + style.substr(1)
+
 }

@@ -1,6 +1,7 @@
 <template>
   <div class="singer" ref="singer">
     <list-view @select="selectSinger" :data="singers" ref="list"></list-view>
+    <!--歌手详情页singer-detail渲染，这里是通过路由引进来的，而不是组件-->
     <router-view></router-view>
   </div>
 </template>
@@ -10,6 +11,7 @@
   import {ERR_OK} from '../../api/config.js'
   import Singer from '../../common/js/singer.js'
   import ListView from '../../base/listview/listview.vue'
+  import {mapMutations} from 'vuex'
 
   const HOT_SINGER_LEN = 10
   const HOT_NAME = '热门'
@@ -31,17 +33,18 @@
         this.$refs.singer.style.bottom = bottom
         this.$refs.list.refresh()
       },
-      selectSinger(singer) {
+      selectSinger(item) {
+//        console.log(item)
         this.$router.push({
-          path: `/singer/${singer.id}`
+          path: `/singer/${item.id}`  //编程时导航，这里的id在router里的index.js是有配置的
         })
-        this.setSinger(singer)
+        this.setSinger(item) //this.$store.commit('SET_SINGER')
+        //把点击的当前歌手提交保存在vuex
       },
       _getSingerList() {
         getSingerList().then((res) => {
           if (res.code === ERR_OK) {
             this.singers = this._normalizeSinger(res.data.list)
-//            console.log(res)
           }
         })
       },
@@ -79,7 +82,7 @@
           }))
         })
 
-        console.log(map)
+//        console.log(map)
 
         // 为了得到有序列表，我们需要处理 map，因为现在的map是map.key+map.hot的混合体
         //处理后的好处，1、有序 2、hot和ret分开
@@ -96,11 +99,17 @@
         ret.sort((a, b) => {
           return a.title.charCodeAt(0) - b.title.charCodeAt(0)
         })
-        console.log(this.singers)
-
         return hot.concat(ret)
       },
+      /*扩展运算符，调用语法糖mapMutations，映射成一个方法setSinger*/
+      ...mapMutations({
+        setSinger:'SET_SINGER'// 将 this.setSinger()映射为this.$store.commit('SET_SINGER')
+      })
     },
+
+    mounted(){
+
+  },
     components: {
       ListView
     }

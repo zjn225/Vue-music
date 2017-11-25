@@ -45,7 +45,6 @@
     //钩子函数
     mounted() {
       setTimeout(() => {
-        console.log(BScroll)
         this._setSliderWidth()
         this._initDots()
         this._initSlider()
