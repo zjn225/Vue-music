@@ -4,6 +4,7 @@ import axios from 'axios'
 
 export function getRecommend() {
   const url = "https://c.y.qq.com/musichall/fcgi-bin/fcg_yqqhomepagerecommend.fcg"
+  //浅拷贝、对象属性的合并
   const data = Object.assign({}, commonParams, {
     platform: 'h5',
     uin: 0,

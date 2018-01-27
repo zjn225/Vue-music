@@ -21,7 +21,7 @@
   export default {
     //非data数据
     name: 'slider',
-    //控制轮播的参数，props子组件接受来自父组件的数据
+    //控制轮播的参数
     props: {
       loop: {
         type: Boolean,
@@ -66,7 +66,7 @@
     //钩子函数
     activated() {
       if (this.autoPlay) {
-        this._play()
+        this._play() //立即开始播放
       }
     },
     //钩子函数
@@ -86,9 +86,9 @@
         for (let i = 0; i < this.children.length; i++) {
           let child = this.children[i]
           addClass(child, 'slider-item')  //在dom.js中定义了此方法
-          //          console.log(child)  //可以看出720 x 288
+          // console.log(child)  //可以看出720 x 288
           //          以下两句为关键
-          child.style.width = sliderWidth + 'px'  //强制将获得的图片数据的尺寸调正常
+          child.style.width = sliderWidth + 'px'  //强制将获得的图片数据的尺寸调为屏幕的宽度
           width += sliderWidth  //总的宽度 === 所有图片的宽度加起来
         }
         if (this.loop ) { //这部分不随窗口大小改变而变化
@@ -96,6 +96,7 @@
         }
         this.$refs.sliderGroup.style.width = width + 'px'  //轮播图的总宽度
       },
+
       /*初始化Vue的轮播图组件，给予各个参数*/
       _initSlider() {
         this.slider = new BScroll(this.$refs.slider, {
@@ -122,16 +123,21 @@
           }
         })
 
+        //不让手动拖动和自动轮播起冲突
         this.slider.on('beforeScrollStart', () => {
           //getCurrentPage是_initSlider里的
           if (this.autoPlay) {
-            clearTimeout(this.timer)  //不让手动拖动和自动轮播起冲突
+            clearTimeout(this.timer)
           }
         })
       },
+
+      //初始化小圆点
       _initDots() {
         this.dots = new Array(this.children.length)
       },
+
+      //循环播放
       _play() {
         let pageIndex = this.currentPageIndex + 1
         if (this.loop) {

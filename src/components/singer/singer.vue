@@ -9,7 +9,7 @@
 <script>
   import {getSingerList} from '../../api/singer.js'
   import {ERR_OK} from '../../api/config.js'
-  import Singer from '../../common/js/singer.js'
+  import Singer from '../../common/js/singer.js' //singer构造器
   import ListView from '../../base/listview/listview.vue'
   import {mapMutations} from 'vuex'
 
@@ -28,11 +28,12 @@
     },
 
     methods: {
-      handlePlaylist(playlist) {
+   /*   handlePlaylist(playlist) {
         const bottom = playlist.length > 0 ? '60px' : ''
         this.$refs.singer.style.bottom = bottom
         this.$refs.list.refresh()
-      },
+      },*/
+
       selectSinger(item) {
 //        console.log(item)
         this.$router.push({
@@ -41,6 +42,7 @@
         this.setSinger(item) //this.$store.commit('SET_SINGER')
         //把点击的当前歌手提交保存在vuex
       },
+
       _getSingerList() {
         getSingerList().then((res) => {
           if (res.code === ERR_OK) {
@@ -50,7 +52,7 @@
       },
       /*核心，因为getSingerList中返回的数据res是所有歌声的信息，而我们想要的是按字母排列的*/
       _normalizeSinger(list) {
-        let map = {    //map对象包括hot、key属性
+        let map = {    //map对象包括hot、key属性，
           hot: {
             title: HOT_NAME,  //title就是侧栏显示的东西，这里为热门
             items: []
@@ -69,8 +71,8 @@
           }
           /*这里的Findex是姓氏字母,为A-Z*/
           const key = item.Findex
-          //这里的if是必须要加的，因为一开始的map只有hot对象，因为没有key，所以放在后面来添加
-          if (!map[key]) {  //这里的map[key]就是A-Z包含的歌手集合，这里和热门的不冲突，因为热门的也有Findex
+          //这里的if是必须要加的，因为一开始的map只有hot对象，因为没有key（title），所以放在后面来添加
+          if (!map[key]) {  //这里的map[key]就是A-Z包含的歌手集合
             map[key] = {
               title: key, //title就是侧栏显示的东西，这里为A-Z
               items: []
@@ -82,9 +84,9 @@
           }))
         })
 
-//        console.log(map)
+       console.log(map)
 
-        // 为了得到有序列表，我们需要处理 map，因为现在的map是map.key+map.hot的混合体
+        // 为了得到有序列表，我们需要处理 map
         //处理后的好处，1、有序 2、hot和ret分开
         let ret = [] //A-Z
         let hot = [] //热门
@@ -101,6 +103,7 @@
         })
         return hot.concat(ret)
       },
+
       /*扩展运算符，调用语法糖mapMutations，映射成一个方法setSinger*/
       ...mapMutations({
         setSinger:'SET_SINGER'// 将 this.setSinger()映射为this.$store.commit('SET_SINGER')

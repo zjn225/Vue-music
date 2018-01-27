@@ -3,7 +3,8 @@ import originJsonp from 'jsonp'
 export default function jsonp(url, data, option) {
   //判断url是否有？，有的话后面加&，没有的话加？
   url += (url.indexOf('?') < 0 ? '?' : '&') + param(data)
-  //返回的类型是promise类型
+  // console.log(url.indexOf('?') < 0 ? '?' : '&');  //&
+  // console.log(param(data));  //g_tk=1928093487&inCharset=utf-8&outCharset=utf-8&notice=0&format=jsonp&platform=h5&uin=0&needNewCode=1
   return new Promise((resolve, reject) => {
     originJsonp(url, option, (err, data) => {
       if (!err) {

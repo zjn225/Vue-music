@@ -10,7 +10,9 @@
   import BScroll from 'better-scroll'
 
   export default {
-    props: {  //父组件传递过来的数据
+    props: {
+      //子组件要显式地用 props 选项声明它预期的数据：
+      //父组件要使用的数据，比如<scroll :data="xxx">，这个data就是这里props声明的，xxx是父组件里data的
       probeType: {
         type: Number,
         default: 1
@@ -50,6 +52,7 @@
         if (!this.$refs.wrapper) {
           return
         }
+
         this.scroll = new BScroll(this.$refs.wrapper, {
           probeType: this.probeType,
           click: this.click
@@ -59,6 +62,8 @@
           let me = this
           this.scroll.on('scroll', (pos) => {
             me.$emit('scroll', pos)
+            //点击事件纯粹是把事件派发出去，因为scroll是个基础组件，不负责业务逻辑
+            //用的时候:scroll="方法名"，参数是pos
           })
         }
 

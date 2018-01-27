@@ -16,7 +16,6 @@ Vue.use(VueLazyLoad,{
 })
 
 Vue.config.productionTip = false
-
 new Vue({
   el: '#app',
   router,

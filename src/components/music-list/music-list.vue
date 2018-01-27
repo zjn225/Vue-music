@@ -91,8 +91,8 @@
       /*设置图片高度*/
       this.imageHeight = this.$refs.bgImage.clientHeight
       this.$refs.list.$el.style.top = `${this.imageHeight}px`
-      /*一屏之后的最小距离，加40是因为滑动的时候顶部始终要留40px的高*/
-      this.minTransalteY = -this.imageHeight + RESERVED_HEIGHT //-263+40=-223
+      /*滑过一屏之后的遮罩层的滚动距离，加40是因为滑动的时候顶部始终要留40px的高*/
+      this.defaultLayerY = -this.imageHeight + RESERVED_HEIGHT //-263+40=-223
     },
     methods: {
       handlePlaylist(playlist) {
@@ -126,13 +126,16 @@
     },
     watch: {
       scrollY(newVal) {
-        //最大的滚动距离,-223和newVal，显然一开始都是newVal大，后来就是minT最大了，从而限制了最上面留一个高度
-        let translateY = Math.max(this.minTransalteY, newVal)
-//        console.log(this.minTransalteY,newVal)
+        //遮罩层的的滚动距离,-223和newVal，显然一开始都是newVal大，后来就是minT最大了，从而限制了最上面留一个高度
+        let layerY = Math.max(this.defaultLayerY, newVal)
+//        console.log(this.defaultLayerY,newVal)
         let scale = 1  //图片的缩放比例
         let zIndex = 0
         let blur = 0
         const percent = Math.abs(newVal / this.imageHeight)
+
+        /*开始设置z-index和blur，只分大于0和小于0，所以分开写了*/
+
         if (newVal > 0) { //大于0的时候即已经是最上面了，还要向上滑动
           scale = 1 + percent
           zIndex = 10  //保证放大后的图片能全部显示出来
@@ -141,20 +144,20 @@
         }
 
         /*当scrollY产生变化时，layer层执行以下动画*/
-        this.$refs.layer.style[transform] = `translate3d(0,${translateY}px,0)` //Y轴变化的动画
+        this.$refs.layer.style[transform] = `translate3d(0,${layerY}px,0)` //遮罩层Y轴向上移动
         this.$refs.filter.style[backdrop] = `blur(${blur}px)` //css3中的高斯模糊
 
-//        console.log('newVal为：' + newVal, 'minTransalteY为：' + this.minTransalteY)
+//        console.log('newVal为：' + newVal, 'defaultLayerY为：' + this.defaultLayerY)
 
-        if (newVal < this.minTransalteY) {  //第一屏过了
+        if (newVal < this.defaultLayerY) {  //第一屏过了
           zIndex = 10
-          /*之所以时paddingTop，是因为里面有一个btn，靠挤压它来撑开高度*/
           this.$refs.bgImage.style.paddingTop = 0
-          this.$refs.bgImage.style.height = `${RESERVED_HEIGHT}px`  //Y轴变化的最终结果
+          this.$refs.bgImage.style.height = `${RESERVED_HEIGHT}px`
           this.$refs.playBtn.style.display = 'none'
         } else { //还在第一屏
           this.$refs.bgImage.style.paddingTop = '70%' //刚开始的状态以及滑动时还没过第一屏
-          this.$refs.playBtn.style.display = ''
+          this.$refs.playBtn.style.display = '';
+          this.$refs.bgImage.style.height = 0
         }
         /*scrollY变化时设置scale和zIndex*/
         this.$refs.bgImage.style[transform] = `scale(${scale})` //最顶部仍然往上拉产生缩放特效
@@ -256,5 +259,5 @@
         position: absolute
         width: 100%
         top: 50%
-        transform: translateY(-50%)
+        transform: layerY(-50%)
 </style>

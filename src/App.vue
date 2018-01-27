@@ -6,7 +6,7 @@
     <tab></tab>
     <!--keep-alive确保了切换tab时不会重复请求-->
     <keep-alive>
-      <!--路由渲染到这里，前提需要tab切换-->
+      <!--路由渲染到这里-->
       <router-view></router-view>
     </keep-alive>
   </div>
@@ -17,8 +17,8 @@
   import Tab from './components/Tab/Tab.vue'
 
   export default {
-    components: {
-      MHeader,  //顶部组件
+    components: { //注册组件
+      MHeader,
       Tab
     }
   }

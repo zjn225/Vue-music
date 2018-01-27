@@ -3,7 +3,7 @@
     <scroll ref="scroll" class="recommend-content" :data="discList">
       <!--确保有recommends数据才渲染，否则mounted时机不对-->
       <!--因为是轮播图和歌单一起滚动，所以整体加个div包裹-->
-      <div>
+      <div class="scrollAndList">
         <div v-if="recommends.length" class="slider-wrapper" ref="sliderWrapper">
           <!--把slider组件引入，但是本来是不允许在标签内引入的，所以需要在slider组件加入slot-->
           <slider>
@@ -38,16 +38,17 @@
       <div class="loading-container" v-show="!discList.length">
           <loading></loading>
       </div>
+
     </scroll>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
-  import {getRecommend, getDiscList} from '../../api/recommend.js'
-  import Slider from '../../base/slider/slider.vue'
+  import Slider from '../../base/slider/slider.vue' //轮播图组件
+  import Scroll from '../../base/scroll/scroll.vue'  //滚动组件
+  import {getRecommend, getDiscList} from '../../api/recommend.js' //获取api
   import {ERR_OK} from '../../api/config'
-  import Scroll from '../../base/scroll/scroll.vue'
-  import Loading from '../../base/loading/loading.vue'
+  import Loading from '../../base/loading/loading.vue' //网速慢时可见的loading动画
 
   export default {
     data() {
@@ -61,6 +62,7 @@
       this._getDiscList();
     },
     methods: {
+      //获取核心数据recommends
       _getRecommend() {
         getRecommend().then((res) => {
           if (res.code === ERR_OK) { //语义化，其实ERR_OK就是为0
@@ -68,6 +70,8 @@
           }
         })
       },
+
+      //获取核心数据discList
       _getDiscList() {
         getDiscList().then((res) => {
           if (res.code === ERR_OK) {
@@ -100,7 +104,7 @@
   .recommend
     position: fixed
     width: 100%
-    top: 88px
+    top: 88px  //在顶栏和tab栏的下面
     bottom: 0
     .recommend-content
       height: 100%

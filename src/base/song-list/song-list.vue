@@ -3,7 +3,7 @@
     <ul>
      <li v-for="song in songs" class="item">
         <div class="content">
-          <h2 class="name">{{songs.name}}</h2>
+          <h2 class="name">{{song.name}}</h2>
           <p class="desc">{{ getDesc(song)}}</p>
         </div>
      </li>
@@ -25,7 +25,7 @@
     },
     methods:{
       getDesc(song){
-        return `${song.singer}。${song.album}`
+        return `${song.singer} - ${song.album}`
       }
     }
   }

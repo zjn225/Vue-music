@@ -23,8 +23,7 @@
     </ul>
     <!--右侧列表-->
     <div class="list-shortcut" @touchstart.stop.prevent="onShortcutTouchStart"
-         @touchmove.stop.prevent="onShortcutTouchMove"
-         @touchend.stop>
+         @touchmove.stop.prevent="onShortcutTouchMove">
       <ul>
         <!--渲染右侧列表，data-index对应着当前的位置-->
         <li v-for="(item, index) in shortcutList" :data-index="index" class="item"
@@ -48,11 +47,11 @@
   import Loading from '../../base/loading/loading'
   import {getData} from '../../common/js/dom'
 
-  const TITLE_HEIGHT = 30
-  const ANCHOR_HEIGHT = 18   //上下线之间的，也就是group的距离
+  const TITLE_HEIGHT = 30    //左侧顶部fix栏的高度
+  const ANCHOR_HEIGHT = 18   //锚点高度，也就是右侧栏每个字的高度
 
   export default {
-    props: { //接收来自父组件的数据，如singer.vue里的singers
+    props: { //接收来自父组件的数据
       data: {
         type: Array,
         default: []
@@ -62,7 +61,8 @@
       /*右侧列表*/
       shortcutList() {
         return this.data.map((group) => {
-          return group.title.substr(0, 1)
+          // console.log(group)  //a-z的集合+热门的集合
+          return group.title.substr(0, 1) //
         })
       },
       /*顶部固定栏*/
@@ -76,28 +76,35 @@
     data() {
       return {
         scrollY: -1,  //左右联动的关键变量，滚动条位置
-        currentIndex: 0,  //左右联动的关键变量，高亮位置
-        diff: -1
+        currentIndex: 0,  //左右联动的关键变量，对应着右侧高亮的字母！
+        touch:{},
+        listHeight:{}
       }
     },
     created() {
       this.probeType = 3
       this.listenScroll = true
-      this.touch = {}
-      this.listHeight = []
+      // this.touch = {}
+      // this.listHeight = []
     },
     methods: {
       selectItem(item) {
         this.$emit('select', item) //点击事件纯粹是把事件派发出去，因为listView是个基础组件，不负责业务逻辑
+        //用的时候:select="方法名"
       },
 
       /*移动端点击事件，相当于click*/
       onShortcutTouchStart(e) {
-        let anchorIndex = getData(e.target, 'index') //这个方法会加上前缀data-
+        let anchorIndex = getData(e.target, 'index') //点击右侧列表时获取到index
+
+        //(e.target).getAttribute(data-index);
         //以下几个数据都是给滑动的时候用的
         let firstTouch = e.touches[0]   //滑动的时候手指刚碰到的位置
         this.touch.y1 = firstTouch.pageY
         this.touch.anchorIndex = anchorIndex
+
+        console.log(anchorIndex)
+        console.log(this.touch)
 
         this._scrollTo(anchorIndex)
       },
@@ -109,21 +116,25 @@
         let delta = (this.touch.y2 - this.touch.y1) / ANCHOR_HEIGHT | 0  // |0是向下取整，得到偏移了几个锚点
         let anchorIndex = parseInt(this.touch.anchorIndex) + delta
 
+        console.log(this.touch)
+
         this._scrollTo(anchorIndex)
       },
       refresh() {
         this.$refs.listview.refresh()
       },
-      //scroll事件
+
+      //scroll事件，跟着屏幕滑动而高亮的关键！！当然只是捕获到scrollY的值，具体的逻辑在下面的watch里处理
       scroll(pos) {
         this.scrollY = pos.y //这个pos是子组件scroll传递过来的参数
       },
-      /*得到的是每个字母group的高度，得到的listHeight是与右侧栏对应的关键*/
+
+      /*得到的是每个group的高度集合listHeight，是与右侧栏对应的关键*/
       _calculateHeight() {
         this.listHeight = []  //左右联动的关键变量
         const list = this.$refs.listGroup
         let height = 0
-        this.listHeight.push(height)   //group的上限
+        this.listHeight.push(height)
         for (let i = 0; i < list.length; i++) {
           let item = list[i]
           height += item.clientHeight
@@ -138,10 +149,10 @@
         }
         if (index < 0) {
           index = 0
-        } else if (index > this.listHeight.length - 2) {
-          index = this.listHeight.length - 2
+        } else if (index > this.listHeight.length -2 ) {
+          index = this.listHeight.length -2
         }
-        this.scrollY = -this.listHeight[index] //令scrollY等于每个group的上限，这个是左右联动的关键，否则高亮不会跟随移动
+        this.scrollY = -this.listHeight[index] //去掉的话点击时不会跟随移动，滑动不受影响
         this.$refs.listview.scrollToElement(this.$refs.listGroup[index], 0)
         //scroll.vue中的方法，第二个参数是动画时间，通过scrollToElement可以做到点击右侧，滚动到相应的位置
       }
@@ -149,10 +160,11 @@
     watch: {
       data() {
         setTimeout(() => {
-          this._calculateHeight()
+          this._calculateHeight()   //得到listHeight
         }, 20) //数据变化到DOM变化有延迟
       },
-      /*左右联动的关键max，滚动的时候，scrollY发生变化*/
+
+      /*左右联动的关键max，scrollY发生变化，返回currentIndex！！！*/
       scrollY(newY) {
         const listHeight = this.listHeight
         // 当滚动到顶部，newY>0
@@ -161,28 +173,19 @@
           return
         }
         // 在中间部分滚动
-        for (let i = 0; i < listHeight.length - 1; i++) {  //计算group的时候多了一个上限
+        for (let i = 0; i < listHeight.length - 1; i++) {
           let height1 = listHeight[i]  //group的下限
           let height2 = listHeight[i + 1] //group的上限
           if (-newY >= height1 && -newY < height2) {
             //手指往上滑即列表向下的时候newY是负值，也就是一开始是0，列表向下newY都是负值
             this.currentIndex = i
-            this.diff = height2 + newY
             return
           }
         }
         // 当滚动到底部，且-newY大于最后一个元素的上限
         this.currentIndex = listHeight.length - 2  //因为currentIndex是从0开始的，如果从1开始当然是减1
       },
-      /*让顶部栏更平滑的移动*/
-      diff(newVal) {
-        let fixedTop = (newVal > 0 && newVal < TITLE_HEIGHT) ? newVal - TITLE_HEIGHT : 0
-        if (this.fixedTop === fixedTop) {
-          return
-        }
-        this.fixedTop = fixedTop
-        this.$refs.fixed.style.transform = `translate3d(0,${fixedTop}px,0)`
-      }
+
     },
     components: {
       Scroll,
