@@ -1,5 +1,7 @@
+/*歌手*/
 export const singer = state => state.singer
 
+/*播放器*/
 export const playing = state => state.playing
 
 export const fullScreen = state => state.fullScreen

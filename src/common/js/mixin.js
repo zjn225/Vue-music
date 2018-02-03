@@ -16,7 +16,7 @@ export const playlistMixin = {
   },
   watch: {
     playlist(newVal) {
-      this.handlePlaylist(newVal)
+      this.handlePlaylist(newVal)   //函数的定义在调用处
     }
   },
   methods: {

@@ -1,6 +1,9 @@
 /*定义一些常量，写mutation-type做关联目的是书写方便，便于工具检测*/
+
+/*歌手*/
 export const SET_SINGER = 'SET_SINGER'
 
+/*播放器*/
 export const SET_PLAYING_STATE = 'SET_PLAYING_STATE'
 
 export const SET_FULL_SCREEN = 'SET_FULL_SCREEN'

@@ -2,6 +2,7 @@
   <div class="singer" ref="singer">
     <list-view @select="selectSinger" :data="singers" ref="list"></list-view>
     <!--歌手详情页singer-detail渲染，这里是通过路由引进来的，而不是组件-->
+    <!--至于为什么这里能通过router-view引进来,那是在router.js里设置的-->
     <router-view></router-view>
   </div>
 </template>
@@ -12,11 +13,13 @@
   import Singer from '../../common/js/singer.js' //singer构造器
   import ListView from '../../base/listview/listview.vue'
   import {mapMutations} from 'vuex'
+  import {playlistMixin} from '../../common/js/mixin'
 
   const HOT_SINGER_LEN = 10
   const HOT_NAME = '热门'
 
   export default {
+    mixins: [playlistMixin],   //插入mixin，merge它方法，可以理解mixin是java里的接口要实现它
     data() {
       return {
         singers: []
@@ -28,11 +31,12 @@
     },
 
     methods: {
-   /*   handlePlaylist(playlist) {
+      /*解决了底部mini播放窗口占有滚动 的 高度的问题*/
+      handlePlaylist(playlist) {
         const bottom = playlist.length > 0 ? '60px' : ''
         this.$refs.singer.style.bottom = bottom
         this.$refs.list.refresh()
-      },*/
+      },
 
       selectSinger(item) {
 //        console.log(item)
@@ -83,8 +87,6 @@
             id: item.Fsinger_mid
           }))
         })
-
-       console.log(map)
 
         // 为了得到有序列表，我们需要处理 map
         //处理后的好处，1、有序 2、hot和ret分开

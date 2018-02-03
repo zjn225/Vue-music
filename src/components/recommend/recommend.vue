@@ -49,8 +49,11 @@
   import {getRecommend, getDiscList} from '../../api/recommend.js' //获取api
   import {ERR_OK} from '../../api/config'
   import Loading from '../../base/loading/loading.vue' //网速慢时可见的loading动画
+  import {playlistMixin} from '../../common/js/mixin'
 
   export default {
+    mixins: [playlistMixin],   //插入mixin，merge它方法，可以理解mixin是java里的接口要实现它
+
     data() {
       return {
         recommends: [],  //存储轮播图图片
@@ -62,6 +65,13 @@
       this._getDiscList();
     },
     methods: {
+      /*解决了底部mini播放窗口占有滚动 的 高度的问题*/
+      handlePlaylist(playlist) {   //mixin里的方法
+        const bottom = playlist.length > 0 ? '60px' : ''
+        this.$refs.recommend.style.bottom = bottom
+        this.$refs.scroll.refresh()
+      },
+
       //获取核心数据recommends
       _getRecommend() {
         getRecommend().then((res) => {

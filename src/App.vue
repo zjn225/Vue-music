@@ -9,17 +9,21 @@
       <!--路由渲染到这里-->
       <router-view></router-view>
     </keep-alive>
+    <!--播放器，独立的一个层，不受其他影响-->
+    <player></player>
   </div>
 </template>
 
 <script>
   import MHeader from './components/m-header/m-header.vue'
   import Tab from './components/Tab/Tab.vue'
+  import Player from './components/player/player.vue'
 
   export default {
     components: { //注册组件
       MHeader,
-      Tab
+      Tab,
+      Player
     }
   }
 </script>

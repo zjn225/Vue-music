@@ -40,8 +40,8 @@
   import Loading from '../../base/loading/loading'
   import SongList from '../../base/song-list/song-list'
   import {prefixStyle} from '../../common/js/dom'
-  //  import {playlistMixin} from '../../common/js/mixin'
-  //  import {mapActions} from 'vuex'
+   import {playlistMixin} from '../../common/js/mixin'
+   import {mapActions} from 'vuex'
 
   const RESERVED_HEIGHT = 40  //预留高度
   //自动加浏览器的前缀
@@ -49,7 +49,7 @@
   const backdrop = prefixStyle('backdrop-filter')
 
   export default {
-//    mixins: [playlistMixin],
+   mixins: [playlistMixin],   //插入mixin，merge它方法，可以理解mixin是java里的接口要实现它
 
     /*这些参数都是父组件要传过来在本组件使用的，scroll、song-list这些参数是在他们相应的组件内定义的
     * 当然值都是singer-detail传过来的*/
@@ -95,7 +95,8 @@
       this.defaultLayerY = -this.imageHeight + RESERVED_HEIGHT //-263+40=-223
     },
     methods: {
-      handlePlaylist(playlist) {
+      /*解决了底部mini播放窗口占有滚动 的 高度的问题*/
+      handlePlaylist(playlist) {   //mixin里的方法
         const bottom = playlist.length > 0 ? '60px' : ''
         this.$refs.list.$el.style.bottom = bottom
         this.$refs.list.refresh()
@@ -108,21 +109,24 @@
       back() {
         this.$router.back()
       },
+
+      /*点击某一首音乐*/
       selectItem(item, index) {
         this.selectPlay({
           list: this.songs,
           index
         })
       },
+
       random() {
         this.randomPlay({
           list: this.songs
         })
       },
-      /*  ...mapActions([
-          'selectPlay',
+        ...mapActions([
+          'selectPlay',  //和mutation的调用差不多，只不过action的commit是写在了vuex的action文件里
           'randomPlay'
-        ])*/
+        ])
     },
     watch: {
       scrollY(newVal) {
