@@ -1,4 +1,5 @@
 /*歌手*/
+/*歌手*/
 export const singer = state => state.singer
 
 /*播放器*/
@@ -18,6 +19,7 @@ export const currentSong = (state) => {
   return state.playlist[state.currentIndex] || {}
 }
 
+/*歌单详情页*/
 export const disc = state => state.disc
 
 export const topList = state => state.topList

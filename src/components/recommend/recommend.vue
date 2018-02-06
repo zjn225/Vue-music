@@ -19,7 +19,7 @@
         <div class="recommend-list">
           <h1 class="list-title">热门歌单推荐</h1>
           <ul>
-            <li v-for="item in discList" class="item">
+            <li @click="selectItem(item)" v-for="item in discList" class="item">
               <div class="icon">
                 <!--懒加载左侧图片-->
                 <!--这里不用配置needsclick是因为参数里就有click-->
@@ -38,8 +38,9 @@
       <div class="loading-container" v-show="!discList.length">
           <loading></loading>
       </div>
-
     </scroll>
+    <!--二级路由——歌单详情页-->
+    <router-view></router-view>
   </div>
 </template>
 
@@ -50,6 +51,7 @@
   import {ERR_OK} from '../../api/config'
   import Loading from '../../base/loading/loading.vue' //网速慢时可见的loading动画
   import {playlistMixin} from '../../common/js/mixin'
+  import {mapMutations} from 'vuex'
 
   export default {
     mixins: [playlistMixin],   //插入mixin，merge它方法，可以理解mixin是java里的接口要实现它
@@ -70,6 +72,14 @@
         const bottom = playlist.length > 0 ? '60px' : ''
         this.$refs.recommend.style.bottom = bottom
         this.$refs.scroll.refresh()
+      },
+
+      /*跳到歌单详情页*/
+      selectItem(item) {
+        this.$router.push({
+          path: `/recommend/${item.dissid}`
+        })
+        this.setDisc(item)
       },
 
       //获取核心数据recommends
@@ -96,7 +106,11 @@
           this.$refs.scroll.refresh()
           this.checkloaded = true;
         }
-      }
+      },
+
+      ...mapMutations({
+        setDisc : 'SET_DISC'
+      })
 
     },
 
