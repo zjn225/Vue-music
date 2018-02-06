@@ -66,6 +66,7 @@
         type: String,
         default: ''
       },
+      /*和song-list一样都有这个参数，但这个是供top-list调用的*/
       rank: {
         type: Boolean,
         default: false
@@ -124,7 +125,9 @@
         })
       },
         ...mapActions([
-          'selectPlay',  //和mutation的调用差不多，只不过action的commit是写在了vuex的action文件里
+          'selectPlay',
+          //和mutation的调用差不多，只不过action的commit是写在了vuex的action文件里,通过改变vuex的state值
+          //使全局的player全屏呈现
           'randomPlay'
         ])
     },

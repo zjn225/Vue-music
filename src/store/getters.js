@@ -22,6 +22,7 @@ export const currentSong = (state) => {
 /*歌单详情页*/
 export const disc = state => state.disc
 
+/*排行榜*/
 export const topList = state => state.topList
 
 export const searchHistory = state => state.searchHistory
