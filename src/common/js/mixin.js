@@ -2,6 +2,7 @@ import {mapGetters, mapMutations, mapActions} from 'vuex'
 import {playMode} from '../../common/js/config'
 import {shuffle} from '../../common/js/util'
 
+/*避免player播放器造成的高度问题*/
 export const playlistMixin = {
   computed: {
     ...mapGetters([

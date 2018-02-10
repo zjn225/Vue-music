@@ -1,13 +1,17 @@
+/*操作多个mutation时用action*/
 import * as types from "../../../vue-music/src/store/mutation-types";
 import {playMode} from '../common/js/config'
 import {shuffle} from '../common/js/util'
+import {saveSearch,deleteSearch,clearSearch} from '../common/js/cache'
 
+/*查询列表是否有这首歌*/
 function findIndex(list,song) {
   return list.findIndex((item)=>{
     return item.id === song.id
   })
 }
 
+/*播放一首歌曲*/
 export const selectPlay = function ({commit, state}, {list, index}) {
   commit(types.SET_SEQUENCE_LIST, list)
   if(state.mode === playMode.random){
@@ -22,6 +26,7 @@ export const selectPlay = function ({commit, state}, {list, index}) {
   commit(types.SET_PLAYING_STATE, true)
 }
 
+/*随机播放*/
 export const randomPlay = function ({commit},{list}) {
   commit(types.SET_PLAY_MODE,playMode)
   commit(types.SET_SEQUENCE_LIST,list)
@@ -30,4 +35,62 @@ export const randomPlay = function ({commit},{list}) {
   commit(types.SET_CURRENT_INDEX, 0)
   commit(types.SET_FULL_SCREEN, true)
   commit(types.SET_PLAYING_STATE, true)
+}
+
+/*搜索结果中点击歌曲*/
+export const insertSong = function ({commit, state}, song) {
+  let playlist = state.playlist.slice()  //返回一个副本
+  let sequenceList = state.sequenceList.slice()
+  let currentIndex = state.currentIndex  //这里的是值类型赋值，不会影响state的值
+  // 记录当前歌曲
+  let currentSong = playlist[currentIndex]
+
+  /*开始插入playList*/
+  // 查找当前列表中是否有待插入的歌曲并返回其索引
+  let fpIndex = findIndex(playlist, song)
+  // 因为是插入歌曲，所以索引+1
+  currentIndex++
+  // 插入这首歌到当前索引位置
+  playlist.splice(currentIndex, 0, song)
+  // 如果当前列表已经包含了这首歌
+  if (fpIndex > -1) {
+    // 如果当前插入的序号大于列表中的序号
+    if (currentIndex > fpIndex) {   // [1,2,3,4,2]
+      playlist.splice(fpIndex, 1)  //删除fpindex
+      currentIndex--
+    } else {                        //[2,1,2,3,4]
+      playlist.splice(fpIndex + 1, 1)  //删除fpindex
+    }
+  }
+  /*开始插入sequenceList*/
+  let currentSIndex = findIndex(sequenceList, currentSong) + 1
+  let fsIndex = findIndex(sequenceList, song)
+  sequenceList.splice(currentSIndex, 0, song)
+  if (fsIndex > -1) {
+    if (currentSIndex > fsIndex) {
+      sequenceList.splice(fsIndex, 1)
+    } else {
+      sequenceList.splice(fsIndex + 1, 1)
+    }
+  }
+  commit(types.SET_PLAYLIST, playlist)
+  commit(types.SET_SEQUENCE_LIST, sequenceList)
+  commit(types.SET_CURRENT_INDEX, currentIndex)
+  commit(types.SET_FULL_SCREEN, true)
+  commit(types.SET_PLAYING_STATE, true)
+}
+
+/*保存搜索结果*/
+export const saveSearchHistory = function ({commit}, query) {
+  commit(types.SET_SEARCH_HISTORY, saveSearch(query))
+}
+
+/*删除历史*/
+export const deleteSearchHistory = function ({commit}, query) {
+  commit(types.SET_SEARCH_HISTORY, deleteSearch(query))
+}
+
+/*删除所有历史*/
+export const clearSearchHistory = function ({commit}) {
+  commit(types.SET_SEARCH_HISTORY, clearSearch())
 }

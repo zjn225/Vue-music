@@ -29,6 +29,7 @@
         type: Array,
         default: null
       },
+      /*下拉加载更多*/
       pullup: {
         type: Boolean,
         default: false
@@ -53,11 +54,13 @@
           return
         }
 
+        /*初始化*/
         this.scroll = new BScroll(this.$refs.wrapper, {
           probeType: this.probeType,
           click: this.click
         })
 
+        /*监听滚动*/
         if (this.listenScroll) {
           let me = this
           this.scroll.on('scroll', (pos) => {
@@ -67,6 +70,7 @@
           })
         }
 
+        /*下拉加载更多*/
         if (this.pullup) {
           this.scroll.on('scrollEnd', () => {
             if (this.scroll.y <= (this.scroll.maxScrollY + 50)) {
@@ -75,6 +79,7 @@
           })
         }
 
+        /*下拉之前*/
         if (this.beforeScroll) {
           this.scroll.on('beforeScrollStart', () => {
             this.$emit('beforeScroll')

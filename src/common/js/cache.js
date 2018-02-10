@@ -11,25 +11,19 @@ const FAVORITE_MAX_LEN = 200
 
 function insertArray(arr, val, compare, maxLen) {
   const index = arr.findIndex(compare)
-  if (index === 0) {
+  if (index === 0) {  //存在，在第一条数据，不用操作
     return
   }
-  if (index > 0) {
+  if (index > 0) {    //存在，在后面，先删、
     arr.splice(index, 1)
   }
-  arr.unshift(val)
-  if (maxLen && arr.length > maxLen) {
+  arr.unshift(val)     //插入数组头部
+  if (maxLen && arr.length > maxLen) { //不能超过长度
     arr.pop()
   }
 }
 
-function deleteFromArray(arr, compare) {
-  const index = arr.findIndex(compare)
-  if (index > -1) {
-    arr.splice(index, 1)
-  }
-}
-
+/*保存*/
 export function saveSearch(query) {
   let searches = storage.get(SEARCH_KEY, [])
   insertArray(searches, query, (item) => {
@@ -39,6 +33,15 @@ export function saveSearch(query) {
   return searches
 }
 
+
+function deleteFromArray(arr, compare) {
+  const index = arr.findIndex(compare)
+  if (index > -1) {
+    arr.splice(index, 1)
+  }
+}
+
+/*删除搜索记录*/
 export function deleteSearch(query) {
   let searches = storage.get(SEARCH_KEY, [])
   deleteFromArray(searches, (item) => {
@@ -48,11 +51,13 @@ export function deleteSearch(query) {
   return searches
 }
 
+/*删除所有历史*/
 export function clearSearch() {
   storage.remove(SEARCH_KEY)
   return []
 }
 
+/*加载储存  ---  在state.js中调用*/
 export function loadSearch() {
   return storage.get(SEARCH_KEY, [])
 }

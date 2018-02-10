@@ -25,6 +25,7 @@ export const disc = state => state.disc
 /*排行榜*/
 export const topList = state => state.topList
 
+/*搜索历史*/
 export const searchHistory = state => state.searchHistory
 
 export const playHistory = state => state.playHistory
