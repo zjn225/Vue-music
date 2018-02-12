@@ -6,7 +6,7 @@
     </div>
     <!--热门搜索，搜索框有文字时show为false-->
     <div ref="shortcutWrapper" class="shortcut-wrapper" v-show="!query">
-      <scroll ref="shortcut" class="shortcut" :data="shortcut">
+      <scroll ref="shortcut" class="shortcut" :data="shortcut" :refreshDelay="refreshDelay">
         <!--根据关键字+搜索历史 计算scroll高度来滚动-->
         <div>
           <div class="hot-key">
@@ -50,15 +50,14 @@
   import Suggest from '../../components/suggest/suggest'
   import {getHotKey} from '../../api/search'
   import {ERR_OK} from '../../api/config'
-  import {playlistMixin} from '../../common/js/mixin'
-  import {mapActions, mapGetters} from 'vuex'
+  import {playlistMixin,searchMixin} from '../../common/js/mixin'
+  import {mapActions} from 'vuex'
 
   export default {
-    mixins: [playlistMixin],   //插入mixin，merge它方法，可以理解mixin是java里的接口要实现它
+    mixins: [playlistMixin,searchMixin],   //插入mixin，merge它方法，可以理解mixin是java里的接口要实现它
     data() {
       return {
         hotKey: [],
-        query: '',
       }
     },
 
@@ -68,9 +67,6 @@
         return this.hotKey.concat(this.searchHistory)
       },
 
-      ...mapGetters([
-        'searchHistory'
-      ])
     },
 
     created() {
@@ -78,10 +74,6 @@
     },
 
     methods: {
-      /*点击后添加到搜索框*/
-      addQuery(query) {
-        this.$refs.searchBox.setQuery(query)  //search-box里的方法
-      },
       handlePlaylist(playlist) {
         const bottom = playlist.length > 0 ? '60px' : ''
         this.$refs.shortcutWrapper.style.bottom = bottom
@@ -93,11 +85,6 @@
       /*搜索框输入文字时，首先@query是search-box.vue里watch到query变化后emit过来的方法，
       目的是获得让父组件也就是search.vue获得search-box里的query*/
 
-      /*search.vue也就是本组件获得query后，传递给了子组件suggest.vue*/
-      onQueryChange(query) {
-        this.query = query
-      },
-
       /*获取热门搜索关键字*/
       _getHotKey() {
         getHotKey().then((res) => {
@@ -107,30 +94,12 @@
         })
       },
 
-      /*blur出去是让手机键盘出来*/
-      blurInput() {
-        this.$refs.searchBox.blur()   //这个blur方法又是子组件search-box上的方法
-      },
-
-      saveSearch() {
-        this.saveSearchHistory(this.query)
-      },
-
-      /*这些可以不用代理起来，直接写在@click里，因为mapActions里相当于写在了methods里了*/
-      /*   deleteOne(item){
-           this.deleteSearchHistory(item);
-         },
-
-         deleteAll(){
-           this.clearSearchHistory()
-         },*/
       showConfirm() {
         this.$refs.confirm.show()
       },
 
+      // mapActions里相当于写在了methods里了
       ...mapActions([
-        'saveSearchHistory',
-        'deleteSearchHistory',
         'clearSearchHistory'
       ])
 

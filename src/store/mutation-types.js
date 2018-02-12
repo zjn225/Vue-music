@@ -25,6 +25,7 @@ export const SET_TOP_LIST = 'SET_TOP_LIST'
 /*搜索历史*/
 export const SET_SEARCH_HISTORY = 'SET_SEARCH_HISTORY'
 
+/*add-song里使用的播放历史*/
 export const SET_PLAY_HISTORY = 'SET_PLAY_HISTORY'
 
 export const SET_FAVORITE_LIST = 'SET_FAVORITE_LIST'

@@ -1,8 +1,10 @@
 import storage from 'good-storage'
 
+/*搜索结果相关*/
 const SEARCH_KEY = '__search__'
 const SEARCH_MAX_LEN = 15
 
+/*播放列表相关*/
 const PLAY_KEY = '__play__'
 const PLAY_MAX_LEN = 200
 
@@ -23,7 +25,7 @@ function insertArray(arr, val, compare, maxLen) {
   }
 }
 
-/*保存*/
+/*保存搜索记录*/
 export function saveSearch(query) {
   let searches = storage.get(SEARCH_KEY, [])
   insertArray(searches, query, (item) => {
@@ -62,6 +64,7 @@ export function loadSearch() {
   return storage.get(SEARCH_KEY, [])
 }
 
+/*保存播放列表*/
 export function savePlay(song) {
   let songs = storage.get(PLAY_KEY, [])
   insertArray(songs, song, (item) => {
@@ -71,6 +74,7 @@ export function savePlay(song) {
   return songs
 }
 
+/*加载播放列表*/
 export function loadPlay() {
   return storage.get(PLAY_KEY, [])
 }

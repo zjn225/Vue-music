@@ -38,6 +38,7 @@
         type: Boolean,
         default: false
       },
+      /*刷新延迟，默认20ms*/
       refreshDelay: {
         type: Number,
         default: 20

@@ -101,34 +101,38 @@
             <i @click.stop="togglePlaying" class="icon-mini" :class="miniIcon"></i>
           </progress-circle>
         </div>
-        <div class="control">
+        <div class="control" @click="showPlayList">
           <i class="icon-playlist"></i>
         </div>
       </div>
     </transition>
-
+    <!--播放列表-->
+    <PlayList ref="playlist"></PlayList>
     <!--播放-->
     <audio ref="audio" :src="currentSong.url" @canplay="ready"
-           @error="error" @timeupdate="updateTime" @ended="end"></audio>
+           @error="error" @timeupdate="updateTime" @ended="end">
+    </audio>
 
   </div>
 </template>
 
 <script>
-  import {mapGetters, mapMutations} from 'vuex'
+  import {mapGetters, mapMutations,mapActions} from 'vuex'
   import animations from 'create-keyframe-animation'
   import {prefixStyle} from '../../common/js/dom'
   import ProgressBar from '../../base/progress-bar/progress-bar'
   import ProgressCircle from '../../base/progress-circle/progress-circle'
   import {playMode} from '../../common/js/config'
-  import {shuffle} from '../../common/js/util'
   import Lyric from 'lyric-parser'
   import Scroll from '../../base/scroll/scroll'
+  import PlayList from '../../components/playlist/playlist'
+  import {playerMixin} from '../../common/js/mixin'
 
   const transform = prefixStyle('transform')
   const transitionDuration = prefixStyle('transitionDuration')
 
   export default {
+    mixins:[playerMixin],//和playList组件共享一部分逻辑
     data() {
       return {
         songReady: false,
@@ -145,10 +149,6 @@
       /*播放大图标*/
       playIcon() {
         return this.playing ? 'icon-pause' : 'icon-play'
-      },
-      /*播放模式*/
-      iconMode() {
-        return this.mode === playMode.sequence ? 'icon-sequence' : this.mode === playMode.loop ? 'icon-loop' : 'icon-random'
       },
       /*播放小图标*/
       miniIcon() {
@@ -189,7 +189,10 @@
       open() {
         this.setFullScreen(true);
       },
-
+      /*显示播放列表*/
+      showPlayList() {
+        this.$refs.playlist.show()
+      },
       /*vue动画的钩子函数*/
       enter(el, done) {
         const {x, y, scale} = this._getPosAndScale()
@@ -241,7 +244,7 @@
         if (!this.songReady) {
           return
         }
-        if(this.playlist.length===1){
+        if (this.playlist.length === 1) {
           this.loop();
         }
         let index = this.currentIndex + 1
@@ -261,7 +264,7 @@
         if (!this.songReady) {
           return
         }
-        if(this.playlist.length===1){
+        if (this.playlist.length === 1) {
           this.loop();
         }
         let index = this.currentIndex - 1
@@ -306,7 +309,8 @@
 
       /*audio标签里播放成功时触发.*/
       ready() {
-        this.songReady = true;
+        this.songReady = true
+        this.savePlayHistory(this.currentSong) //保存到播放历史
       },
 
       /*audio标签监听，加载失败时触发*/
@@ -439,28 +443,6 @@
         }
       },
 
-      /*改变循环模式*/
-      changeMode() {
-        const mode = (this.mode + 1) % 3
-        console.log(mode)
-        this.setPlayMode(mode)
-        let list = null;
-        if (mode === playMode.random) {
-          list = shuffle(this.sequenceList)
-        } else {
-          list = this.sequenceList
-        }
-        this.resetCurrentIndex(list)
-        this.setPlaylist(list);
-      },
-
-      resetCurrentIndex(list) {
-        let index = list.findIndex((item) => {
-          return item.id === this.currentSong.id;
-        })
-        this.setCurrentIndex(index);
-      },
-
 
       //初始缩放
       _getPosAndScale() {
@@ -479,16 +461,20 @@
 
       ...mapMutations({
         setFullScreen: 'SET_FULL_SCREEN',  //设置全屏
-        setPlayingState: 'SET_PLAYING_STATE',
-        setCurrentIndex: 'SET_CURRENT_INDEX',
-        setPlayMode: 'SET_PLAY_MODE', //设置播放模式
-        setPlaylist: 'SET_PLAYLIST'
-      })
+      }),
+
+      ...mapActions([
+        'savePlayHistory'
+      ])
     },
 
     watch: {
       /*currentSong改变时说明刚点击了其他歌曲*/
       currentSong(newSong, oldSong) {
+        /*适用于播放列表请到为空时*/
+        if (!newSong.id) {
+          return
+        }
         if (newSong.id === oldSong.id) {
           return
         }
@@ -502,7 +488,7 @@
         setTimeout(() => {   //加延迟
           this.$refs.audio.play();
           this.getLyric();
-        },1000)
+        }, 1000)
       },
 
       /*监听播放状态的改变，--> icon变化*/
@@ -518,7 +504,8 @@
     components: {
       ProgressBar,
       ProgressCircle,
-      Scroll
+      Scroll,
+      PlayList
     }
 
   }
