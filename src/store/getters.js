@@ -31,4 +31,5 @@ export const searchHistory = state => state.searchHistory
 /*add-song里使用的播放历史*/
 export const playHistory = state => state.playHistory
 
+/*个人中心喜欢列表*/
 export const favoriteList = state => state.favoriteList

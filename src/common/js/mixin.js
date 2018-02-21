@@ -65,7 +65,7 @@ export const playerMixin = {
       })
       this.setCurrentIndex(index);
     },
-
+    /*切换喜欢/不喜欢*/
     toggleFavorite(song) {
       if (this.isFavorite(song)) {
         this.deleteFavoriteList(song)
@@ -73,12 +73,14 @@ export const playerMixin = {
         this.saveFavoriteList(song)
       }
     },
+    /*获取个人中心喜欢列表*/
     getFavoriteIcon(song) {
       if (this.isFavorite(song)) {
         return 'icon-favorite'
       }
       return 'icon-not-favorite'
     },
+    /*是否喜欢*/
     isFavorite(song) {
       const index = this.favoriteList.findIndex((item) => {
         return item.id === song.id

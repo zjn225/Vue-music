@@ -2,7 +2,7 @@
 import * as types from "../../../vue-music/src/store/mutation-types";
 import {playMode} from '../common/js/config'
 import {shuffle} from '../common/js/util'
-import {saveSearch, deleteSearch, clearSearch,savePlay} from '../common/js/cache'
+import {saveSearch, deleteSearch, clearSearch,savePlay,saveFavorite,deleteFavorite} from '../common/js/cache'
 
 /*查询列表是否有这首歌*/
 function findIndex(list, song) {
@@ -131,6 +131,7 @@ export const savePlayHistory = function ({commit}, song) {
   commit(types.SET_PLAY_HISTORY, savePlay(song))
 }
 
+/*个人中心喜欢列表*/
 export const saveFavoriteList = function ({commit}, song) {
   commit(types.SET_FAVORITE_LIST, saveFavorite(song))
 }

@@ -28,4 +28,5 @@ export const SET_SEARCH_HISTORY = 'SET_SEARCH_HISTORY'
 /*add-song里使用的播放历史*/
 export const SET_PLAY_HISTORY = 'SET_PLAY_HISTORY'
 
+/*个人中心喜欢列表*/
 export const SET_FAVORITE_LIST = 'SET_FAVORITE_LIST'
